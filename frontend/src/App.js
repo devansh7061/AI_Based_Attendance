@@ -1,7 +1,3 @@
-
-import { extendTheme } from "@chakra-ui/react";
-import { dividerTheme } from "./components/Divider.js";
-
 import "./App.css";
 import { Navigate, Link, BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -10,9 +6,6 @@ import Login from "./pages/Login";
 import Home from "./pages/Home.js";
 import Admin from "./pages/Admin";
 import Protected from "./components/Protected";
-export const theme = extendTheme({
-  components: { Divider: dividerTheme },
-});
 
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);

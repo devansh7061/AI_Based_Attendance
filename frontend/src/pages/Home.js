@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Divider, Center, Flex, Spacer } from "@chakra-ui/react";
+import { Box, Center, Flex, Spacer } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import Card from "../components/Card";
 function Home() {
@@ -40,9 +40,6 @@ function Home() {
           </Flex>
         </Center>
       </div>
-      <Center height="50px">
-        <Divider orientation="vertical" variant="thick" />
-      </Center>
     </div>
   );
 }

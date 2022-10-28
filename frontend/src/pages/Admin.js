@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-
+import Form from "../components/Form/Form";
 function Admin() {
-  return <div>Admin</div>
+  return <div>
+    <Form />
+  </div>
 }
 
 export default Admin;

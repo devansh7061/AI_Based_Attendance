@@ -1,6 +1,5 @@
 import express from "express";
-import path from "path";
-import http from "http";
+import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import loginRouter from "./routes/login.js";
@@ -20,15 +19,21 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
   next();
 });
-app.get("/hello", function (req, res) {
+app.get("/", function (req, res) {
   res.send("Hello");
 });
 app.use("/", loginRouter);
 app.use("/admin", adminRouter);
 const PORT = process.env.PORT || 5000;
 app.set("PORT", PORT);
-const server = http.createServer(app);
-server.listen(PORT);
-server.on("listening", () => {
-  console.log("Listening on " + PORT);
-});
+const CONNECTION_URL =
+  "mongodb+srv://na20b016:na20b016@cluster0.l14ovvg.mongodb.net/?retryWrites=true&w=majority";
+mongoose
+  .connect(CONNECTION_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() =>
+    app.listen(PORT, () => console.log(`Server running on port: ${PORT}`))
+  )
+  .catch((error) => console.log(error.message));
