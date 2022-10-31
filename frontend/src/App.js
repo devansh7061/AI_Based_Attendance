@@ -5,6 +5,7 @@ import { useState } from "react";
 import Login from "./pages/Login";
 import Home from "./pages/Home.js";
 import Admin from "./pages/Admin";
+import Student from "./pages/Student";
 import Protected from "./components/Protected";
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />}></Route>
+        <Route path="/student" element={<Student />}></Route>
         <Route
         path="/login"
         element={<Login isLoggedIn={isLoggedIn} setLoggedIn={setLoggedIn} />}

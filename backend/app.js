@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import loginRouter from "./routes/login.js";
 import adminRouter from "./routes/admin.js";
-
+import recordRouter from "./routes/record.js";
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -24,10 +24,11 @@ app.get("/", function (req, res) {
 });
 app.use("/", loginRouter);
 app.use("/admin", adminRouter);
+app.use("/viewRecord", recordRouter)
 const PORT = process.env.PORT || 5000;
 app.set("PORT", PORT);
 const CONNECTION_URL =
-  "mongodb+srv://na20b016:na20b016@cluster0.l14ovvg.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb://na20b016:na20b016@ac-6vjuoyv-shard-00-00.l14ovvg.mongodb.net:27017,ac-6vjuoyv-shard-00-01.l14ovvg.mongodb.net:27017,ac-6vjuoyv-shard-00-02.l14ovvg.mongodb.net:27017/?ssl=true&replicaSet=atlas-iqdlsi-shard-0&authSource=admin&retryWrites=true&w=majority";
 mongoose
   .connect(CONNECTION_URL, {
     useNewUrlParser: true,
