@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import * as faceapi from "face-api.js";
+import "./Student.css";
 import { useSelector, useDispatch } from "react-redux";
-import { getStudents } from "../actions/students";
-import { addRecord } from "../actions/records";
+import { getStudents } from "../../actions/students";
+import { addRecord } from "../../actions/records";
+import {useDisclosure, Button, Alert, AlertIcon, AlertDialog, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, AlertDialogContent, AlertDialogCloseButton, AlertDialogBody, Center} from "@chakra-ui/react"
 
 function Student() {
   const students = useSelector((state) => state.students);
@@ -11,7 +13,10 @@ function Student() {
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [captureVideo, setCaptureVideo] = useState(false);
   const [faceDetected, setFaceDetected] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const [studentRecord, setStudentRecord] = useState({ name: "", desc: "" });
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef();
   const videoRef = React.useRef();
   const videoHeight = 480;
   const videoWidth = 640;
@@ -30,6 +35,7 @@ function Student() {
       ]).then(setModelsLoaded(true));
     };
     loadModels();
+    startVideo();
   }, [dispatch]);
   const handleClick = () => {
     // e.preventDefault();
@@ -38,7 +44,7 @@ function Student() {
     console.log(studentRecord);
     setStudentRecord({ name: "", desc: "" });
     alert("Your attendance has been marked!");
-    videoRef.current.play();
+    onClose();
   };
   const startVideo = () => {
     setCaptureVideo(true);
@@ -72,6 +78,7 @@ function Student() {
   };
   const handleVideoOnPlay = async () => {
     const labeledDescriptors = await loadLabeledImages();
+    setImagesLoaded(true);
     console.log(labeledDescriptors);
     const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.7);
     setInterval(async () => {
@@ -115,13 +122,13 @@ function Student() {
             canvasRef.current &&
             faceapi.draw.drawDetections(canvasRef.current, [box]);
           if (result._label !== "unknown") {
-            closeWebcam();
             setFaceDetected(true);
             students.map((student) => {
               if (student.name == result._label) {
                 setStudentRecord({ name: student.name, desc: student.desc });
               }
             });
+            onOpen();
           }
         });
       }
@@ -135,47 +142,46 @@ function Student() {
   };
   return (
     <div>
+      {!imagesLoaded ? (
+        <div>
+          <Alert status="warning">
+            <AlertIcon />
+            Please wait, models are being loaded!
+          </Alert>
+        </div>
+      ) : (
+        <></>
+      )}
       <div style={{ textAlign: "center", padding: "10px" }}>
-        {captureVideo && modelsLoaded ? (
-          <button
-            onClick={closeWebcam}
-            style={{
-              cursor: "pointer",
-              backgroundColor: "green",
-              color: "white",
-              padding: "15px",
-              fontSize: "25px",
-              border: "none",
-              borderRadius: "10px",
-            }}
-          >
-            Close Webcam
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={startVideo}
-              style={{
-                cursor: "pointer",
-                backgroundColor: "green",
-                color: "white",
-                padding: "15px",
-                fontSize: "25px",
-                border: "none",
-                borderRadius: "10px",
-              }}
-            >
-              Open Webcam
-            </button>
-            <div className={faceDetected?"student-details": "hidden"}>
-              <p>{studentRecord.name}</p>
-              <button style={{ margin: "30px" }} onClick={handleClick}>
+        <AlertDialog
+          motionPreset="slideInBottom"
+          leastDestructiveRef={cancelRef}
+          onClose={onClose}
+          isOpen={isOpen}
+          isCentered
+        >
+          <AlertDialogOverlay />
+
+          <AlertDialogContent>
+            <AlertDialogHeader>Confirm your attendance</AlertDialogHeader>
+            <AlertDialogCloseButton />
+            <AlertDialogBody>
+              Are you {studentRecord.name}?
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => {
+                onClose();
+                setFaceDetected(false);
+                startVideo();
+              }}>
+                Try again
+              </Button>
+              <Button colorScheme="red" ml={3} onClick={handleClick}>
                 Confirm
-              </button>
-              <button onClick={() => videoRef.current.play()}>Try again</button>
-            </div>
-          </>
-        )}
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
       {captureVideo ? (
         modelsLoaded ? (
@@ -198,7 +204,7 @@ function Student() {
             </div>
           </div>
         ) : (
-          <div>loading...</div>
+          <div>Loading...</div>
         )
       ) : (
         <></>

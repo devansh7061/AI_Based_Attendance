@@ -1,0 +1,11 @@
+.menu{
+    float: left;
+    margin-left: 5px;
+}
+.buttons{
+    float: right;
+    margin-right: 5px;
+}
+.buttons .logout-btn{
+    margin-right: 10px;
+}

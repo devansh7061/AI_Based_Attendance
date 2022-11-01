@@ -1,0 +1,11 @@
+.hidden{
+    display: none;
+}
+
+.student-details{
+    background-color: #f3944d;
+    color: #fefefd;
+    width: 300px;
+    height: 150px;
+    border-radius: 22px;
+}
