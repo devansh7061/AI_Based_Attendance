@@ -1,4 +1,4 @@
-import * as api from "../api";
+import * as api from "../api/viewRecord";
 
 // Action Creators
 export const getRecords = () => async (dispatch) => {

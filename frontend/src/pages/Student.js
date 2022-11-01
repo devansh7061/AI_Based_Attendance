@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import * as faceapi from "face-api.js";
 import { useSelector, useDispatch } from "react-redux";
 import { getStudents } from "../actions/students";
+import { addRecord } from "../actions/records";
 
 function Student() {
   const students = useSelector((state) => state.students);
   const dispatch = useDispatch();
-
   console.log(students);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [captureVideo, setCaptureVideo] = useState(false);
   const [faceDetected, setFaceDetected] = useState(false);
-  const [studentDetected, setStudentDetected] = useState("");
+  const [studentRecord, setStudentRecord] = useState({ name: "", desc: "" });
   const videoRef = React.useRef();
   const videoHeight = 480;
   const videoWidth = 640;
@@ -31,6 +31,15 @@ function Student() {
     };
     loadModels();
   }, [dispatch]);
+  const handleClick = () => {
+    // e.preventDefault();
+    console.log("clicked");
+    dispatch(addRecord(studentRecord));
+    console.log(studentRecord);
+    setStudentRecord({ name: "", desc: "" });
+    alert("Your attendance has been marked!");
+    videoRef.current.play();
+  };
   const startVideo = () => {
     setCaptureVideo(true);
     navigator.mediaDevices
@@ -47,18 +56,19 @@ function Student() {
   const loadLabeledImages = () => {
     return Promise.all(
       students.map(async (student) => {
-      const descriptions = [];
-      console.log(student.img);
-      const img = await faceapi.fetchImage(student.img);
-      const detections = await faceapi
-        .detectSingleFace(img)
-          .withFaceLandmarks().withFaceDescriptor();
-      console.log(detections);
-      descriptions.push(detections.descriptor);
-      console.log(descriptions);
-      return new faceapi.LabeledFaceDescriptors(student.name, descriptions);
-    })
-    )
+        const descriptions = [];
+        console.log(student.img);
+        const img = await faceapi.fetchImage(student.img);
+        const detections = await faceapi
+          .detectSingleFace(img)
+          .withFaceLandmarks()
+          .withFaceDescriptor();
+        console.log(detections);
+        descriptions.push(detections.descriptor);
+        console.log(descriptions);
+        return new faceapi.LabeledFaceDescriptors(student.name, descriptions);
+      })
+    );
   };
   const handleVideoOnPlay = async () => {
     const labeledDescriptors = await loadLabeledImages();
@@ -103,13 +113,15 @@ function Student() {
           const box = resizedDetections[i].detection.box;
           canvasRef &&
             canvasRef.current &&
-            faceapi.draw.drawDetections(canvasRef.current, [
-              box
-            ]);
+            faceapi.draw.drawDetections(canvasRef.current, [box]);
           if (result._label !== "unknown") {
-            videoRef.current.pause();
+            closeWebcam();
             setFaceDetected(true);
-            setStudentDetected(result._label);
+            students.map((student) => {
+              if (student.name == result._label) {
+                setStudentRecord({ name: student.name, desc: student.desc });
+              }
+            });
           }
         });
       }
@@ -140,20 +152,29 @@ function Student() {
             Close Webcam
           </button>
         ) : (
-          <button
-            onClick={startVideo}
-            style={{
-              cursor: "pointer",
-              backgroundColor: "green",
-              color: "white",
-              padding: "15px",
-              fontSize: "25px",
-              border: "none",
-              borderRadius: "10px",
-            }}
-          >
-            Open Webcam
-          </button>
+          <>
+            <button
+              onClick={startVideo}
+              style={{
+                cursor: "pointer",
+                backgroundColor: "green",
+                color: "white",
+                padding: "15px",
+                fontSize: "25px",
+                border: "none",
+                borderRadius: "10px",
+              }}
+            >
+              Open Webcam
+            </button>
+            <div className={faceDetected?"student-details": "hidden"}>
+              <p>{studentRecord.name}</p>
+              <button style={{ margin: "30px" }} onClick={handleClick}>
+                Confirm
+              </button>
+              <button onClick={() => videoRef.current.play()}>Try again</button>
+            </div>
+          </>
         )}
       </div>
       {captureVideo ? (
@@ -174,11 +195,6 @@ function Student() {
                 style={{ borderRadius: "10px" }}
               />
               <canvas ref={canvasRef} style={{ position: "absolute" }} />
-              <div className="student-details">
-                <p>{studentDetected}</p>
-                <button>Confirm</button>
-                <button onClick={() => videoRef.current.play()}>Try again</button>
-              </div>
             </div>
           </div>
         ) : (
