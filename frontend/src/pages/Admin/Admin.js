@@ -1,9 +1,29 @@
 import React, { useEffect, useState } from "react";
+import FileBase from "react-file-base64";
+import { addStudent } from "../../actions/students";
 import Form from "../../components/Form/Form";
 import { useSelector, useDispatch } from "react-redux";
 import { getRecords } from "../../actions/records";
-import { Center, Box, Button, Menu, MenuButton, IconButton } from "@chakra-ui/react";
-import {HamburgerIcon} from "@chakra-ui/icons"
+import {
+  Center,
+  useDisclosure,
+  Box,
+  Button,
+  Menu,
+  MenuButton,
+  IconButton,
+  FormLabel,
+  FormControl,
+  Input,
+  ModalBody,
+  ModalOverlay,
+  ModalContent,
+  Modal,
+  ModalHeader,
+  ModalFooter,
+  ModalCloseButton,
+} from "@chakra-ui/react";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import {
   Table,
   Thead,
@@ -27,6 +47,21 @@ function Admin() {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+  const [studentData, setStudentData] = useState({
+    name: "",
+    desc: "",
+    img: "",
+  });
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(addStudent(studentData));
+    console.log(studentData);
+    setStudentData({ name: "", desc: "", img: "" });
+    alert("Student added successfully!");
+    onClose();
+  };
+  
   return (
     <div>
       <Box
@@ -51,9 +86,53 @@ function Admin() {
           <Button colorScheme="gray" variant="outline" className="logout-btn">
             Logout
           </Button>
-          <Button colorScheme="gray" variant="outline">
+          <Button colorScheme="gray" variant="outline" onClick={onOpen}>
             Add Student
           </Button>
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Add Student</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody pb={6}>
+                <FormControl>
+                  <FormLabel>Name</FormLabel>
+                  <Input
+                    placeholder="Name"
+                    value={studentData.name}
+                    onChange={(e) =>
+                      setStudentData({ ...studentData, name: e.target.value })
+                    }
+                  />
+                </FormControl>
+
+                <FormControl mt={4}>
+                  <FormLabel>Roll No.</FormLabel>
+                  <Input
+                    placeholder="Roll No."
+                    value={studentData.desc}
+                    onChange={(e) =>
+                      setStudentData({ ...studentData, desc: e.target.value })
+                    }
+                  />
+                </FormControl>
+                <FileBase
+                  type="file"
+                  multiple={false}
+                  onDone={({ base64 }) =>
+                    setStudentData({ ...studentData, img: base64 })
+                  }
+                />
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
+                  Save
+                </Button>
+                <Button onClick={onClose}>Cancel</Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </div>
       </Box>
       <TableContainer>
