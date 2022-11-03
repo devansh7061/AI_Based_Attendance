@@ -1,0 +1,14 @@
+.form{
+    margin-top: 200px;
+    background-color: #ef7a63;
+    color: #ffffff;
+    height: 350px;
+    width: 350px;
+    border-radius: 18px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.formContent{
+    margin-top: 25px;
+}

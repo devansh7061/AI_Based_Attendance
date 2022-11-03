@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import FileBase from "react-file-base64";
 import { addStudent } from "../../actions/students";
-import Form from "../../components/Form/Form";
 import { useSelector, useDispatch } from "react-redux";
 import { getRecords } from "../../actions/records";
 import {
@@ -36,7 +35,8 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import "./Admin.css";
-function Admin() {
+import { Navigate } from "react-router-dom";
+function Admin({isLoggedIn, setLoggedIn}) {
   const records = useSelector((state) => state.records);
   const dispatch = useDispatch();
   console.log(records);
@@ -61,7 +61,11 @@ function Admin() {
     alert("Student added successfully!");
     onClose();
   };
-  
+  const handleLogout = (e) => {
+    e.preventDefault();
+    setLoggedIn(false);
+    <Navigate to="/login"></Navigate>
+  };
   return (
     <div>
       <Box
@@ -83,7 +87,7 @@ function Admin() {
         </div>
         Hello Admin!
         <div className="buttons">
-          <Button colorScheme="gray" variant="outline" className="logout-btn">
+          <Button colorScheme="gray" variant="outline" className="logout-btn" onClick={(e) => handleLogout(e)}>
             Logout
           </Button>
           <Button colorScheme="gray" variant="outline" onClick={onOpen}>

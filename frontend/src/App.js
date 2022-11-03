@@ -2,7 +2,7 @@ import "./App.css";
 import { Navigate, Link, BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { useState } from "react";
-import Login from "./pages/Login";
+import Login from "./pages/Login/Login";
 import Home from "./pages/Home.js";
 import Admin from "./pages/Admin/Admin.js";
 import Student from "./pages/Student/Student";
@@ -24,7 +24,7 @@ function App() {
           path="/admin"
           element={
             <Protected isLoggedIn={isLoggedIn}>
-              <Admin />
+              <Admin isLoggedIn={isLoggedIn} setLoggedIn={setLoggedIn} />
             </Protected>
           }
         ></Route>
